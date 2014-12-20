@@ -30,13 +30,13 @@ import (
 
 // IRC configuration parameters
 var (
-	ircServer  = config.String("irc.server", "irc.freenode.net:7000")
-	ircSSL     = config.Bool("irc.ssl", true)
-	ircNick    = config.String("irc.nick", "carrotfacts")
-	ircName    = config.String("irc.name", "")
-	ircUser    = config.String("irc.user", "carrotfacts")
+	ircServer  = config.String("irc.server", "irc.twitch.tv:6667")
+	ircSSL     = config.Bool("irc.ssl", false)
+	ircNick    = config.String("irc.nick", "tasred")
+	ircName    = config.String("irc.name", "tasred")
+	ircUser    = config.String("irc.user", "tasred")
 	ircPass    = config.String("irc.password", "")
-	ircChannel = config.String("irc.channel", "#carrotfacts-test")
+	ircChannel = config.String("irc.channel", "#agdq")
 )
 
 // seed feeds the Go PRNG a cryptographically random number so we don't always
@@ -75,7 +75,7 @@ func main() {
 	ic.HandleFunc("PRIVMSG", func(conn *irc.Conn, line *irc.Line) {
 		channel := line.Args[0]
 		msg := line.Args[1]
-		fmt.Printf("%s %s %s\n", channel, line.Nick, msg)
+		fmt.Printf("%s %s: %s\n", channel, line.Nick, msg)
 	})
 
 	quit := make(chan bool)
@@ -94,7 +94,7 @@ main:
 	for {
 		select {
 		case <-interrupt:
-			ic.Quit("Carrot be with you!")
+			ic.Quit("TASBOT be with you!")
 		case <-quit:
 			log.Printf("Disconnected")
 			break main
