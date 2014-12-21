@@ -16,27 +16,31 @@
 package main
 
 import (
+	"bufio"
 	cryptorand "crypto/rand"
 	"encoding/binary"
 	"flag"
 	"fmt"
 	irc "github.com/fluffle/goirc/client"
 	"github.com/stvp/go-toml-config"
+	"io"
 	"log"
 	"math/rand"
 	"os"
 	"os/signal"
+	"strings"
 )
 
 // IRC configuration parameters
 var (
-	ircServer  = config.String("irc.server", "irc.twitch.tv:6667")
-	ircSSL     = config.Bool("irc.ssl", false)
-	ircNick    = config.String("irc.nick", "tasred")
-	ircName    = config.String("irc.name", "tasred")
-	ircUser    = config.String("irc.user", "tasred")
-	ircPass    = config.String("irc.password", "")
-	ircChannel = config.String("irc.channel", "#agdq")
+	ircServer    = config.String("irc.server", "irc.twitch.tv:6667")
+	ircSSL       = config.Bool("irc.ssl", false)
+	ircNick      = config.String("irc.nick", "tasred")
+	ircName      = config.String("irc.name", "tasred")
+	ircUser      = config.String("irc.user", "tasred")
+	ircPass      = config.String("irc.password", "")
+	ircChannel   = config.String("irc.channel", "#agdq")
+	badWordsFile = config.String("data.badwords", "bad-words.txt")
 )
 
 // seed feeds the Go PRNG a cryptographically random number so we don't always
@@ -50,6 +54,43 @@ func seed() (err error) {
 	return
 }
 
+type Filter struct {
+	badWords []string
+}
+
+// Okay determines if a phrase contains any words from a blacklist
+func (f *Filter) Okay(phrase string) bool {
+	for _, word := range f.badWords {
+		if strings.Contains(phrase, word) {
+			return false
+		}
+	}
+	return true
+}
+
+// readWordList reads words, one per line, from a file, or aborts if it cannot
+// be read.
+func readWordList(filename string) (*Filter, error) {
+	var (
+		f   Filter
+		r   io.ReadCloser
+		err error
+	)
+	if r, err = os.Open(filename); err != nil {
+		return nil, err
+	}
+	defer r.Close()
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		word := scanner.Text()
+		f.badWords = append(f.badWords, word)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return &f, nil
+}
+
 func main() {
 	configFile := flag.String("config", "config.toml", "Config file")
 	flag.Parse()
@@ -57,6 +98,12 @@ func main() {
 	config.Parse(*configFile)
 	if err := seed(); err != nil {
 		log.Fatalf("Unable to seed the PRNG: %s\n", err)
+	}
+
+	var filter *Filter
+	var err error
+	if filter, err = readWordList(*badWordsFile); err != nil {
+		log.Fatalf("Unable to read bad words: %s\n", err)
 	}
 
 	c := irc.NewConfig(*ircNick)
@@ -73,9 +120,14 @@ func main() {
 		})
 
 	ic.HandleFunc("PRIVMSG", func(conn *irc.Conn, line *irc.Line) {
-		channel := line.Args[0]
+		//channel := line.Args[0]
 		msg := line.Args[1]
-		fmt.Printf("%s %s: %s\n", channel, line.Nick, msg)
+		prettyLine := fmt.Sprintf("%s: %s", line.Nick, msg)
+		if filter.Okay(prettyLine) {
+			fmt.Printf("NICE    %s\n", prettyLine)
+		} else {
+			fmt.Printf("NAUGHTY %s\n", prettyLine)
+		}
 	})
 
 	quit := make(chan bool)
