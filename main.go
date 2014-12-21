@@ -16,6 +16,7 @@
 package main
 
 import (
+	"./asciify"
 	"bufio"
 	cryptorand "crypto/rand"
 	"encoding/binary"
@@ -36,8 +37,6 @@ var (
 	ircServer    = config.String("irc.server", "irc.twitch.tv:6667")
 	ircSSL       = config.Bool("irc.ssl", false)
 	ircNick      = config.String("irc.nick", "tasred")
-	ircName      = config.String("irc.name", "tasred")
-	ircUser      = config.String("irc.user", "tasred")
 	ircPass      = config.String("irc.password", "")
 	ircChannel   = config.String("irc.channel", "#agdq")
 	badWordsFile = config.String("data.badwords", "bad-words.txt")
@@ -58,11 +57,15 @@ type Filter struct {
 	badWords []string
 }
 
-// Okay determines if a phrase contains any words from a blacklist
+// Okay determines if a phrase contains any words from the filter list
 func (f *Filter) Okay(phrase string) bool {
-	for _, word := range f.badWords {
-		if strings.Contains(phrase, word) {
-			return false
+	lphrase := strings.ToLower(phrase)
+	words := strings.Fields(lphrase)
+	for _, badness := range f.badWords {
+		for _, word := range words {
+			if strings.EqualFold(badness, word) {
+				return false
+			}
 		}
 	}
 	return true
@@ -111,7 +114,7 @@ func main() {
 	c.Server = *ircServer
 	c.Pass = *ircPass
 	c.Me.Ident = *ircNick
-	c.Me.Name = *ircName
+	c.Me.Name = *ircNick
 	ic := irc.Client(c)
 
 	ic.HandleFunc(irc.CONNECTED,
@@ -121,7 +124,7 @@ func main() {
 
 	ic.HandleFunc("PRIVMSG", func(conn *irc.Conn, line *irc.Line) {
 		//channel := line.Args[0]
-		msg := line.Args[1]
+		msg := asciify.Clobber(line.Args[1])
 		prettyLine := fmt.Sprintf("%s: %s", line.Nick, msg)
 		if filter.Okay(prettyLine) {
 			fmt.Printf("NICE    %s\n", prettyLine)
@@ -146,7 +149,7 @@ main:
 	for {
 		select {
 		case <-interrupt:
-			ic.Quit("TASBOT be with you!")
+			ic.Quit("TASRED be with you!")
 		case <-quit:
 			log.Printf("Disconnected")
 			break main
