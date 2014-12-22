@@ -2,18 +2,15 @@
 
 Join a Twitch IRC channel and classify messages there as "naughty" or "nice".
 
-## Prerequisites
+## Installation
 
-* You'll need a functional Go setup per [the installation instructions][goinstall].  1.4 is known to work; 1.3 probably will as well.  The version in Debian Jessie is known to be too old.
-* [godep][godep]: `go install godep`.
+You'll need a functional Go setup per [the installation instructions][goinstall].  1.4 is known to work; 1.3 probably will as well.  The version in Debian Jessie is known to be too old.
 
 [goinstall]: http://golang.org/doc/install
-[godep]: https://github.com/tools/godep
 
-## Building
+Install from git:
 
-1. Perform a git checkout of this repository to `$GOPATH/src/github.com/twm/TASRED`.  Change to that directory.
-1. Build and install to `$GOPATH/bin` with `godep go install github.com/twm/TASRED`.
+    go get github.com/twm/TASRED
 
 The `TASRED` binary should now be available in `$GOPATH/bin`.  You may want to put this directory on your `PATH`.
 
@@ -27,3 +24,5 @@ You'll need to create a `config.toml` file from this template:
     channel = "#agdq"
 
 You will need to generate a special password here: <http://twitchapps.com/tmi/>.  The account's normal password will *not* work.
+
+You may also want to grab `bad-words.txt` from the repository.
