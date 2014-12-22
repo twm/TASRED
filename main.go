@@ -16,7 +16,6 @@
 package main
 
 import (
-	"./asciify"
 	"bufio"
 	cryptorand "crypto/rand"
 	"encoding/binary"
@@ -24,6 +23,7 @@ import (
 	"fmt"
 	irc "github.com/fluffle/goirc/client"
 	"github.com/stvp/go-toml-config"
+	"github.com/twm/TASRED/asciify"
 	"io"
 	"log"
 	"math/rand"
