@@ -1,0 +1,39 @@
+{
+	"ImportPath": "github.com/twm/TASRED",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/gomock/gomock",
+			"Rev": "e033c7513ca3d743bbb64df299bdec29e93fed03"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/client",
+			"Rev": "82319420863e4973a3133a8f174ff79c7f96dfb6"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/logging",
+			"Rev": "82319420863e4973a3133a8f174ff79c7f96dfb6"
+		},
+		{
+			"ImportPath": "github.com/fluffle/goirc/state",
+			"Rev": "82319420863e4973a3133a8f174ff79c7f96dfb6"
+		},
+		{
+			"ImportPath": "github.com/pelletier/go-toml",
+			"Comment": "v0.2.1-14-g36d65b6",
+			"Rev": "36d65b681a9f120e3bf6f8d0586aa5d0e4519b25"
+		},
+		{
+			"ImportPath": "github.com/stvp/go-toml-config",
+			"Rev": "f601c8895f76b3c87e90ef157b71d2754c7c6a8a"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "ef0bf1da95d2b971524f971801f2a4c2d0b4841f"
+		},
+		{
+			"ImportPath": "golang.org/x/text/unicode/norm",
+			"Rev": "ef0bf1da95d2b971524f971801f2a4c2d0b4841f"
+		}
+	]
+}
